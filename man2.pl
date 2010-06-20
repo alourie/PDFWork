@@ -32,9 +32,14 @@ sub update_finals {
         my $begin = $1;
         my $end = $2;
         my $altern = $3;
-        if ( defined($altern) && ($altern eq "S" || $altern eq "R" || $altern eq "L") ) {
+        if ( defined($altern) && ($altern eq "S" || $altern eq "R" || $altern eq "L" || $altern eq "D") ) {
             for (my $var = $begin; $var <= $end; $var++) {
-                $finalpages{$var} = $altern;
+                if ( $altern eq "D" ) {
+                    $finalpages{$var} = "-1";
+                }
+                else {
+                    $finalpages{$var} = $altern 
+                }
             }
         }
         else {
@@ -47,6 +52,9 @@ sub update_finals {
         my $altern = $2;
         if ( defined($altern) && ($altern eq "S" || $altern eq "R" || $altern eq "L") ) {
             $finalpages{$num} = $altern;
+        }
+        elsif (  $altern eq "D" ) {
+            $finalpages{$num} = "-1";
         }
         else {
             print "ERROR:       $page is incorrect parameter: $altern cannot be used as modifier. Use 'S', 'R' and 'L' only.\n";
@@ -80,7 +88,11 @@ sub main {
     }
 
     for ( my $i = 1; $i < $num+1; $i++ ) {
-        $command = "$command $i$finalpages{$i}";
+        my $next_page = "";
+        if ( $finalpages{$i} ne "-1" ) {
+            $next_page = "$i$finalpages{$i}";
+        }
+        $command = "$command $next_page";
     }
 
     $command = "$command output finalfile.pdf";
