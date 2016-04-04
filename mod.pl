@@ -1,11 +1,13 @@
 #!"C:\perl\bin\perl.exe"
 
 use strict;
+use Switch;
 use File::Copy;
 
 my $command = "pdftk ";
 my %finalpages;
 my $ARGC = @ARGV;
+my $num = 0;
 
 main();
 
@@ -25,20 +27,36 @@ sub num_pages {
     return $num;
 }
  
+sub get_direction {
+    my $d = shift;
+    switch ($d) {
+       case 'R' { return "right" }
+       case 'L' { return "left" }
+       case 'S' { return "south" }
+       case 'N' { return "north" }
+       else {return }
+    }
+}
+
 sub update_finals {
 
     my $page = shift;
-    if ( $page =~ /(\d+)-(\d+)(\w?)/ ) {
+    if ( $page =~ /(\d+)(-\d+|-end)(\w?)/ ) {
         my $begin = $1;
         my $end = $2;
         my $altern = $3;
         if ( defined($altern) && ($altern eq "S" || $altern eq "R" || $altern eq "L" || $altern eq "D") ) {
+            if ( $end == "-end" ) {
+                $end = $num
+            } else {
+                $end =~ s/-//;
+            }
             for (my $var = $begin; $var <= $end; $var++) {
                 if ( $altern eq "D" ) {
                     $finalpages{$var} = "-1";
                 }
                 else {
-                    $finalpages{$var} = $altern 
+                    $finalpages{$var} = get_direction($altern);
                 }
             }
         }
@@ -51,7 +69,7 @@ sub update_finals {
         my $num = $1;
         my $altern = $2;
         if ( defined($altern) && ($altern eq "S" || $altern eq "R" || $altern eq "L") ) {
-            $finalpages{$num} = $altern;
+            $finalpages{$num} = get_direction($altern);
         }
         elsif (  $altern eq "D" ) {
             $finalpages{$num} = "-1";
@@ -72,10 +90,15 @@ sub update_finals {
 sub main {
 
     my ($doc, @pages) = @ARGV;
+    my $finalfile = "finalfile.pdf";
 
+    if ( $doc == "-i" ) {
+       $doc = shift (@pages); 
+       $finalfile = $doc;
+    }
     $command = "$command \"$doc\" cat";
     move($doc, "temp.pdf");
-    my $num = num_pages("temp.pdf");
+    $num = num_pages("temp.pdf");
     move("temp.pdf", $doc);
 
     for ( my $i = 1; $i < $num+1; $i++ ) {
@@ -95,9 +118,9 @@ sub main {
         $command = "$command $next_page";
     }
 
-    $command = "$command output finalfile.pdf";
-    unlink("finalfile.pdf");
+    $command = "$command output temp.pdf";
 
     print "Command:\n$command\n";
     `$command`;
+    move("temp.pdf", $finalfile);   
 }
