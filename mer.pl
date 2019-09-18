@@ -107,11 +107,7 @@ sub main {
 
     }
 
-    my $time = `time /t`;
-    chomp $time;
-    my @newtime = split(':', $time);
-    $time = "$newtime[0]$newtime[1]";
-    my $outfile = "FinalFile_$time\.pdf";
+    my $outfile = "final\.pdf";
 
     $command = $command . " output \"$outfile\"";
     print "\n\nCommand:\n $command\n";
