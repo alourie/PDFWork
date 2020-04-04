@@ -90,9 +90,9 @@ if __name__ == "__main__":
         ",".join(pages['N']) if len(pages['D']) > 0 else '',
         "--",
         f"{work_doc}",
-        "--rotate=-90:{l_pages}".format(l_pages=pages['L']) if len(pages['L']) > 0 else '',
-        "--rotate=+90:{r_pages}".format(r_pages=pages['R']) if len(pages['R']) > 0 else '',
-        "--rotate=+180:{s_pages}".format(s_pages=pages['S']) if len(pages['S']) > 0 else '',
+        "--rotate=-90:{l_pages}".format(l_pages=",".join(pages['L'])) if len(pages['L']) > 0 else '',
+        "--rotate=+90:{r_pages}".format(r_pages=",".join(pages['R'])) if len(pages['R']) > 0 else '',
+        "--rotate=+180:{s_pages}".format(s_pages=",".join(pages['S'])) if len(pages['S']) > 0 else '',
     ]
 
     print("Command:\n{cmd}'\n".format(cmd=" ".join(cmd)))
